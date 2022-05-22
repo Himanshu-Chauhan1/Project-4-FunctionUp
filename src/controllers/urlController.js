@@ -35,9 +35,10 @@ const generateShortUrl = async function(req, res) {
 
         if (!(validUrl.isWebUri(data.longUrl.trim()))) return res.status(400).send({ status: false, message: "Please Provide a valid long Url" })
 
-        let checkUrl = await UrlModel.findOne({ longUrl: data.longUrl })
+        let checkUrl = await UrlModel.findOne({ longUrl: data.longUrl }).select({ __v: 0, createdAt: 0, updatedAt: 0 })
 
-        if (checkUrl) return res.status(400).send({ status: false, message: " With this Long url already a shorted Url already exists, Please Enter a New One", data: checkUrl })
+
+        if (checkUrl) return res.status(200).send({ status: true, message: " With this Long url already a shorted Url already exists, Please Enter a New One", data: checkUrl })
 
         const urlCodegenerate = function(length) {
             const characters = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789"
@@ -73,7 +74,7 @@ const generateShortUrl = async function(req, res) {
 
 //=========================================GET URL=============================================//
 
-let getUrlCode = async function(req, res) {
+const getUrlCode = async function(req, res) {
     try {
         let requestParams = req.params.urlCode;
 
