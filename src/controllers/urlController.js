@@ -1,7 +1,6 @@
 const UrlModel = require('../models/urlModel')
 const validUrl = require('valid-url')
 const redis = require("redis");
-
 const { promisify } = require("util");
 
 //Connect to redis
@@ -70,7 +69,6 @@ const generateShortUrl = async function(req, res) {
     }
 }
 
-
 //=========================================GET URL=============================================//
 
 const getUrlCode = async function(req, res) {
@@ -83,11 +81,10 @@ const getUrlCode = async function(req, res) {
         let parseData = JSON.parse(cachesUrlData)
         if (!parseData) return res.status(404).send({ status: false, message: "Short url doesn't exist" })
 
-
         if (cachesUrlData) {
             return res.status(302).redirect(parseData.longUrl);
         } else {
-            let findUrlCode = await UrlModel.findOne({ urlCode: requestParams });
+            let findUrlCode = await UrlModel.findOne({ urlCode: requestParams }).select({ urlCode: 1, longUrl: 1, shortUrl: 1 });
             if (!findUrlCode) return res.status(404).send({ status: false, message: "Not found this url code" });
 
             await SET_ASYNC(requestParams, JSON.stringify(findUrlCode.longUrl));
